@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="EVPharmacy.Core/EVPharmacy.Core.csproj" />
+  <Project Path="EVPharmacy.Data/EVPharmacy.Data.csproj" />
+  <Project Path="EVPharmacy/EVPharmacy.csproj" />
+</Solution>

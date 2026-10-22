@@ -1,0 +1,318 @@
+﻿<Window x:Class="EVPharmacy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EV Pharmacy"
+        Height="760"
+        Width="1200"
+        MinHeight="600"
+        MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#F6F8F7"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryGreen" Color="#176B50"/>
+        <SolidColorBrush x:Key="SidebarGreen" Color="#123F34"/>
+        <SolidColorBrush x:Key="PageBackground" Color="#F6F8F7"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#202B27"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#77827D"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#E5EAE7"/>
+
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Margin" Value="0,4,0,4"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Foreground" Value="#D5E5DD"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="NavBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="NavBorder"
+                                        Property="Background"
+                                        Value="#24594A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="LogoutButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="15,9"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#43534B"/>
+            <Setter Property="BorderBrush" Value="#DDE5E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="245"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left navigation sidebar -->
+        <Border Grid.Column="0"
+                Background="{StaticResource SidebarGreen}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="90"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <!-- Brand -->
+                <StackPanel Grid.Row="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="24,0,0,0">
+                    <Border Width="38"
+                            Height="38"
+                            Background="#D5EBDD"
+                            CornerRadius="10"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="EV"
+                                   Foreground="#123F34"
+                                   FontSize="17"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel VerticalAlignment="Center"
+                                Margin="11,0,0,0">
+                        <TextBlock Text="EV Pharmacy"
+                                   Foreground="White"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="POINT OF SALE"
+                                   Foreground="#A7C6B7"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Margin="0,3,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Navigation -->
+                <StackPanel Grid.Row="1" Margin="16,20,16,0">
+                    <TextBlock Text="WORKSPACE"
+                               Foreground="#91B5A5"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Margin="12,0,0,12"/>
+
+                    <Button x:Name="InventoryButton"
+                            Style="{StaticResource NavButtonStyle}"
+                            Background="#24594A"
+                            Click="InventoryButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="▦"
+                                       FontSize="20"
+                                       Width="30"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="Inventory"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Sidebar footer -->
+                <Border Grid.Row="2"
+                        BorderBrush="#31594D"
+                        BorderThickness="0,1,0,0"
+                        Padding="22,0">
+                    <TextBlock Text="EV Pharmacy  •  v1.0"
+                               Foreground="#A7C6B7"
+                               FontSize="11"
+                               VerticalAlignment="Center"/>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Main application area -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="76"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderColor}"
+                    BorderThickness="0,0,0,1">
+                <Grid Margin="30,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Dashboard"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"/>
+                        <TextBlock Text="Manage your pharmacy operations"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   Margin="0,3,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Border Width="36"
+                                Height="36"
+                                Background="#E5F2EA"
+                                CornerRadius="18">
+                            <TextBlock x:Name="UserInitialTextBlock"
+                                       Text="U"
+                                       Foreground="{StaticResource PrimaryGreen}"
+                                       FontWeight="SemiBold"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel VerticalAlignment="Center"
+                                    Margin="10,0,18,0">
+                            <TextBlock x:Name="UsernameTextBlock"
+                                       Text="User"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"/>
+                            <TextBlock Text="Signed in"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       FontSize="11"
+                                       Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <Button Content="Log out"
+                                Style="{StaticResource LogoutButtonStyle}"
+                                Click="LogoutButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Dashboard content -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="32">
+
+                    <TextBlock Text="Welcome to EV Pharmacy"
+                               FontSize="25"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimary}"/>
+
+                    <TextBlock Text="Your pharmacy workspace, all in one place."
+                               FontSize="13"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="0,8,0,28"/>
+
+                    <!-- Inventory introduction card -->
+                    <Border Background="White"
+                            BorderBrush="{StaticResource BorderColor}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="25">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="INVENTORY"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryGreen}"/>
+
+                                <TextBlock Text="Keep your stock organized"
+                                           FontSize="20"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"
+                                           Margin="0,10,0,6"/>
+
+                                <TextBlock Text="Manage medicines, monitor stock levels, and keep your product records up to date."
+                                           FontSize="13"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="470"
+                                           LineHeight="21"/>
+
+                                <Button Content="Open Inventory  →"
+                                        HorizontalAlignment="Left"
+                                        Padding="16,10"
+                                        Margin="0,22,0,0"
+                                        Background="{StaticResource PrimaryGreen}"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Cursor="Hand"
+                                        Click="InventoryButton_Click"/>
+                            </StackPanel>
+
+                            <Border Grid.Column="1"
+                                    Width="82"
+                                    Height="82"
+                                    Background="#EAF4ED"
+                                    CornerRadius="18"
+                                    Margin="20,0,0,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="▦"
+                                           FontSize="40"
+                                           Foreground="{StaticResource PrimaryGreen}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Placeholder for future dashboard data -->
+                    <TextBlock Text="OVERVIEW"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondary}"
+                               Margin="0,28,0,12"/>
+
+                    <Border Background="White"
+                            BorderBrush="{StaticResource BorderColor}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="22">
+                        <StackPanel>
+                            <TextBlock Text="Your dashboard is ready"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+
+                            <TextBlock Text="Product counts, low-stock alerts, and sales summaries will appear here as we build the inventory and POS modules."
+                                       FontSize="13"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       TextWrapping="Wrap"
+                                       LineHeight="21"
+                                       Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>
