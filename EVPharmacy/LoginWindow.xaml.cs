@@ -1,86 +1,118 @@
 ﻿
 using EVPharmacy.Data.Services;
+using EVPharmacy.Services;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using static EVPharmacy.Data.Services.UserService;
+using System.Windows.Input;
 
 namespace EVPharmacy;
 
+// Login stays in code-behind: PasswordBox.Password is intentionally not bindable,
+// and this keeps the password out of view-model properties.
 public partial class LoginWindow : Window
 {
     private readonly UserService _userService;
+    private readonly UserSession _session;
+    private bool _isBusy;
 
-    public string AuthenticatedUsername { get; private set; } = string.Empty;
-
-    public LoginWindow(UserService userService)
+    public LoginWindow(UserService userService, UserSession session)
     {
         InitializeComponent();
-        _userService = userService;
 
-        UsernameTextBox.TextChanged += Input_TextChanged;
-        PasswordInput.PasswordChanged += Input_TextChanged;
+        _userService = userService;
+        _session = session;
+
+        UsernameTextBox.TextChanged += (_, _) => OnInputChanged();
+        PasswordInput.PasswordChanged += (_, _) => OnInputChanged();
+        PreviewKeyDown += (_, _) => UpdateCapsLockWarning();
+        PasswordInput.GotKeyboardFocus += (_, _) => UpdateCapsLockWarning();
+        PasswordInput.LostKeyboardFocus += (_, _) => CapsLockWarning.Visibility = Visibility.Collapsed;
 
         UpdateLoginButton();
     }
 
-    private void Input_TextChanged(object sender, RoutedEventArgs e)
+    private void OnInputChanged()
     {
+        HideError();
         UpdateLoginButton();
-        StatusTextBlock.Text = string.Empty;
     }
 
     private void UpdateLoginButton()
     {
         LoginButton.IsEnabled =
+            !_isBusy &&
             !string.IsNullOrWhiteSpace(UsernameTextBox.Text) &&
             !string.IsNullOrWhiteSpace(PasswordInput.Password);
     }
 
-    private async void LoginButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    private void UpdateCapsLockWarning()
     {
-        LoginButton.IsEnabled = false;
-        StatusTextBlock.Text = string.Empty;
+        CapsLockWarning.Visibility =
+            PasswordInput.IsKeyboardFocused && Keyboard.IsKeyToggled(Key.CapsLock)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+    }
+
+    private void ShowError(string message)
+    {
+        ErrorTextBlock.Text = message;
+        ErrorBanner.Visibility = Visibility.Visible;
+    }
+
+    private void HideError()
+    {
+        ErrorBanner.Visibility = Visibility.Collapsed;
+    }
+
+    private async void LoginButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_isBusy)
+        {
+            return;
+        }
+
+        _isBusy = true;
+        UpdateLoginButton();
+        HideError();
+        LoginButton.Content = "Signing in…";
 
         try
         {
-            var result = await _userService.AuthenticateAsync(
+            var outcome = await _userService.AuthenticateAsync(
                 UsernameTextBox.Text,
                 PasswordInput.Password);
 
-            switch (result)
+            switch (outcome.Result)
             {
-                case AuthenticationResult.Success:
-                    AuthenticatedUsername = UsernameTextBox.Text.Trim();
+                case AuthenticationResult.Success when outcome.User is not null:
+                    _session.SignIn(outcome.User);
                     DialogResult = true;
-                    break;
+                    return;
 
                 case AuthenticationResult.AccountDeactivated:
-                    StatusTextBlock.Text =
-                        "Your account has been deactivated.";
+                    ShowError("This account has been deactivated. Please contact your administrator.");
                     break;
 
                 default:
-                    StatusTextBlock.Text =
-                        "Invalid username or password.";
+                    // Clear first: PasswordChanged hides any visible error.
+                    PasswordInput.Clear();
+                    PasswordInput.Focus();
+                    ShowError("Incorrect username or password.");
                     break;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            StatusTextBlock.Text =
-                "Unable to log in. Please try again.";
+            ErrorLogger.Log(ex, "Login failed");
+            ShowError("Unable to sign in right now. Please try again.");
         }
         finally
         {
+            _isBusy = false;
             if (IsLoaded)
             {
+                LoginButton.Content = "Sign in";
                 UpdateLoginButton();
             }
-
-            UpdateLoginButton();
         }
     }
 }

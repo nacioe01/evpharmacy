@@ -1,34 +1,74 @@
 ﻿
-using Microsoft.EntityFrameworkCore;
 using EVPharmacy.Core.Entities;
 using EVPharmacy.Core.Security;
 using EVPharmacy.Data.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace EVPharmacy.Data.Services;
 
+public enum AuthenticationResult
+{
+    Success,
+    InvalidCredentials,
+    AccountDeactivated
+}
+
+public sealed record AuthenticatedUser(int Id, string Username, bool IsAdmin);
+
+public sealed record AuthenticationOutcome(
+    AuthenticationResult Result,
+    AuthenticatedUser? User = null);
+
+/// <summary>
+/// User account operations. Each call uses its own short-lived DbContext,
+/// so the service itself is safe to register as a singleton.
+/// </summary>
 public class UserService
 {
-    private readonly AppDbContext _dbContext;
+    public const int MaxUsernameLength = 36;
 
-    public UserService(AppDbContext dbContext)
+    // Used to keep login timing similar whether or not the username exists.
+    private static readonly Lazy<string> DummyHash =
+        new(() => PasswordHasher.HashPassword(Guid.NewGuid().ToString()));
+
+    private readonly IDbContextFactory<AppDbContext> _contextFactory;
+
+    public UserService(IDbContextFactory<AppDbContext> contextFactory)
     {
-        _dbContext = dbContext;
+        _contextFactory = contextFactory;
     }
 
-    public async Task<bool> CreateAdminAsync(
-        string username,
-        string password)
+    public async Task<bool> AnyUsersExistAsync()
     {
-        var normalizedUsername = username.Trim();
+        await using var dbContext = await _contextFactory.CreateDbContextAsync();
+        return await dbContext.Users.AnyAsync();
+    }
 
-        if (string.IsNullOrWhiteSpace(normalizedUsername) ||
-            string.IsNullOrWhiteSpace(password))
+    /// <summary>
+    /// Creates an administrator account.
+    /// Returns false when the username is already taken.
+    /// Throws ArgumentException when input fails validation.
+    /// </summary>
+    public async Task<bool> CreateAdminAsync(string username, string password)
+    {
+        var normalizedUsername = username?.Trim() ?? string.Empty;
+
+        var usernameError = ValidateUsername(normalizedUsername);
+        if (usernameError is not null)
         {
-            throw new ArgumentException(
-                "Username and password are required.");
+            throw new ArgumentException(usernameError);
         }
 
-        var exists = await _dbContext.Users.AnyAsync(
+        var passwordError = PasswordPolicy.Validate(password);
+        if (passwordError is not null)
+        {
+            throw new ArgumentException(passwordError);
+        }
+
+        await using var dbContext = await _contextFactory.CreateDbContextAsync();
+
+        // Comparison is case-insensitive via the NOCASE column collation.
+        var exists = await dbContext.Users.AnyAsync(
             user => user.Username == normalizedUsername);
 
         if (exists)
@@ -36,56 +76,85 @@ public class UserService
             return false;
         }
 
-        var admin = new User
+        dbContext.Users.Add(new User
         {
             Username = normalizedUsername,
-            Password = PasswordHasher.HashPassword(password),
-            Status = "active",
+            PasswordHash = PasswordHasher.HashPassword(password),
+            Status = UserStatus.Active,
             IsAdmin = true
-        };
+        });
 
-        _dbContext.Users.Add(admin);
-        await _dbContext.SaveChangesAsync();
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // Unique index caught a concurrent duplicate.
+            return false;
+        }
 
         return true;
     }
 
-    public enum AuthenticationResult
-    {
-        Success,
-        InvalidCredentials,
-        AccountDeactivated
-    }
-
-
-    public async Task<AuthenticationResult> AuthenticateAsync(
+    public async Task<AuthenticationOutcome> AuthenticateAsync(
         string username,
         string password)
     {
         if (string.IsNullOrWhiteSpace(username) ||
             string.IsNullOrWhiteSpace(password))
         {
-            return AuthenticationResult.InvalidCredentials;
+            return new AuthenticationOutcome(AuthenticationResult.InvalidCredentials);
         }
 
         var normalizedUsername = username.Trim();
 
-        var user = await _dbContext.Users
-            .SingleOrDefaultAsync(
-                user => user.Username == normalizedUsername);
+        await using var dbContext = await _contextFactory.CreateDbContextAsync();
 
-        if (user is null ||
-            !PasswordHasher.VerifyPassword(password, user.Password))
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Username == normalizedUsername);
+
+        if (user is null)
         {
-            return AuthenticationResult.InvalidCredentials;
+            PasswordHasher.VerifyPassword(password, DummyHash.Value);
+            return new AuthenticationOutcome(AuthenticationResult.InvalidCredentials);
         }
 
-        if (user.Status != "active")
+        if (!PasswordHasher.VerifyPassword(password, user.PasswordHash))
         {
-            return AuthenticationResult.AccountDeactivated;
+            return new AuthenticationOutcome(AuthenticationResult.InvalidCredentials);
         }
 
-        return AuthenticationResult.Success;
+        if (user.Status != UserStatus.Active)
+        {
+            return new AuthenticationOutcome(AuthenticationResult.AccountDeactivated);
+        }
+
+        return new AuthenticationOutcome(
+            AuthenticationResult.Success,
+            new AuthenticatedUser(user.Id, user.Username, user.IsAdmin));
     }
 
+    public static string? ValidateUsername(string? username)
+    {
+        var value = username?.Trim() ?? string.Empty;
+
+        if (value.Length == 0)
+        {
+            return "Username is required.";
+        }
+
+        if (value.Length > MaxUsernameLength)
+        {
+            return $"Username must be {MaxUsernameLength} characters or fewer.";
+        }
+
+        if (value.Any(char.IsWhiteSpace))
+        {
+            return "Username cannot contain spaces.";
+        }
+
+        return null;
+    }
 }

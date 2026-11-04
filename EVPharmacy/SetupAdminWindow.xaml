@@ -1,44 +1,78 @@
 ﻿<Window x:Class="EVPharmacy.SetupAdminWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="EVPharmacy - Initial Admin Setup"
-        Height="420"
-        Width="400"
+        Title="EV Pharmacy - First-time setup"
+        Width="520"
+        SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Background="{StaticResource AppBackgroundBrush}"
+        FontFamily="{StaticResource AppFont}"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Display"
+        FocusManager.FocusedElement="{Binding ElementName=UsernameTextBox}">
 
-    <Grid Margin="25">
+    <Border Style="{StaticResource Card}"
+            Margin="28"
+            Padding="36,32">
         <StackPanel>
-            <TextBlock Text="EVPharmacy"
-                       FontSize="26"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal">
+                <Border Style="{StaticResource BrandMark}">
+                    <TextBlock Text="EV"
+                               Foreground="{StaticResource OnPrimaryBrush}"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center" Margin="11,0,0,0">
+                    <TextBlock Text="EV Pharmacy"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text="First-time setup" Style="{StaticResource Text.Caption}"/>
+                </StackPanel>
+            </StackPanel>
 
-            <TextBlock Text="Create your administrator account"
-                       FontSize="14"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,25"/>
+            <TextBlock Text="Create the administrator account"
+                       Style="{StaticResource Text.Title}"
+                       Margin="0,26,0,6"/>
+            <TextBlock Text="This account manages staff, settings and backups. Keep its password private."
+                       Style="{StaticResource Text.Body}"
+                       Margin="0,0,0,24"/>
 
-            <TextBlock Text="Username"/>
+            <TextBlock Text="Username" Style="{StaticResource Text.FieldLabel}"/>
             <TextBox x:Name="UsernameTextBox"
-                     Height="24"
-                     Margin="0,5,0,15"/>
+                     MaxLength="36"
+                     AutomationProperties.Name="Username"/>
 
-            <TextBlock Text="Password"/>
-            <PasswordBox x:Name="PasswordInput"
-                         Height="24"
-                         Margin="0,5,0,15"/>
+            <TextBlock Text="Password"
+                       Style="{StaticResource Text.FieldLabel}"
+                       Margin="0,18,0,6"/>
+            <PasswordBox x:Name="PasswordInput" AutomationProperties.Name="Password"/>
+            <TextBlock x:Name="PasswordHintTextBlock"
+                       Style="{StaticResource Text.Caption}"
+                       Margin="0,6,0,0"/>
 
-            <TextBlock Text="Confirm Password"/>
-            <PasswordBox x:Name="ConfirmPasswordInput"
-                         Height="24"
-                         Margin="0,5,0,20"/>
+            <TextBlock Text="Confirm password"
+                       Style="{StaticResource Text.FieldLabel}"
+                       Margin="0,16,0,6"/>
+            <PasswordBox x:Name="ConfirmPasswordInput" AutomationProperties.Name="Confirm password"/>
 
-            <Button Content="Create Admin Account"
-                    Height="38"
+            <Border x:Name="ErrorBanner"
+                    Style="{StaticResource ErrorBanner}"
+                    Margin="0,18,0,0"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="ErrorTextBlock" TextWrapping="Wrap"/>
+            </Border>
+
+            <Button x:Name="CreateButton"
+                    Content="Create administrator"
+                    Style="{StaticResource Button.Primary}"
+                    MinHeight="46"
+                    Margin="0,24,0,0"
+                    IsDefault="True"
                     Click="CreateAdminButton_Click"/>
-
         </StackPanel>
-    </Grid>
+    </Border>
 </Window>

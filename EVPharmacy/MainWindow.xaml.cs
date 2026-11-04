@@ -1,51 +1,36 @@
 ﻿
-using System.Windows;
+using EVPharmacy.Services;
+using EVPharmacy.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace EVPharmacy;
 
 public partial class MainWindow : Window
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly UserSession _session;
 
-    public MainWindow(IServiceProvider serviceProvider)
+    public MainWindow(
+        MainViewModel viewModel,
+        IServiceProvider serviceProvider,
+        UserSession session)
     {
         InitializeComponent();
+
         _serviceProvider = serviceProvider;
+        _session = session;
+
+        DataContext = viewModel;
+        viewModel.LogoutRequested += OnLogoutRequested;
     }
 
-    public string CurrentUsername
-    {
-        get => UsernameTextBlock.Text;
-        set
-        {
-            UsernameTextBlock.Text = value;
-            UserInitialTextBlock.Text =
-                string.IsNullOrWhiteSpace(value)
-                    ? "U"
-                    : value[..1].ToUpperInvariant();
-        }
-    }
-
-    private void InventoryButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        MessageBox.Show(
-            "The Inventory module will be implemented next.",
-            "Inventory",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
-    }
-
-
-    private void LogoutButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    private void OnLogoutRequested(object? sender, EventArgs e)
     {
         var result = MessageBox.Show(
+            this,
             "Are you sure you want to log out?",
-            "Confirm Logout",
+            "Log out",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question,
             MessageBoxResult.No);
@@ -55,22 +40,19 @@ public partial class MainWindow : Window
             return;
         }
 
+        _session.SignOut();
         Hide();
 
-        var loginWindow =
-            _serviceProvider.GetRequiredService<LoginWindow>();
+        var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
 
-        var loginResult = loginWindow.ShowDialog();
-
-        if (loginResult == true)
+        if (loginWindow.ShowDialog() == true)
         {
-            CurrentUsername = loginWindow.AuthenticatedUsername;
             Show();
+            Activate();
         }
         else
         {
             Application.Current.Shutdown();
         }
     }
-
 }
