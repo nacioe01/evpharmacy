@@ -47,6 +47,34 @@
                 <views:ListsView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:PosViewModel}">
+                <views:PosView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                <views:SettingsView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:SalesHistoryViewModel}">
+                <views:SalesHistoryView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:UsersViewModel}">
+                <views:UsersView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:AuditLogViewModel}">
+                <views:AuditLogView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:BackupViewModel}">
+                <views:BackupView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:ReportsViewModel}">
+                <views:ReportsView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type vm:PlaceholderViewModel}">
                 <views:PlaceholderView/>
             </DataTemplate>

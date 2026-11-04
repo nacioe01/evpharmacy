@@ -1,0 +1,174 @@
+<UserControl x:Class="EVPharmacy.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EVPharmacy.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:ReportsViewModel}"
+             d:DesignWidth="1150" d:DesignHeight="700">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <Style x:Key="PresetButton" TargetType="Button" BasedOn="{StaticResource Button.Secondary}">
+            <Setter Property="MinHeight" Value="32"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="FontSize" Value="12.5"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="32,24,32,24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ===================== Report list ===================== -->
+        <Border Style="{StaticResource Card}" Padding="8">
+            <ItemsControl ItemsSource="{Binding Options}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ReportOption}">
+                        <Button Command="{Binding DataContext.SelectCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}"
+                                HorizontalContentAlignment="Stretch"
+                                Margin="0,0,0,2"
+                                Padding="12,10">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource Button.Ghost}">
+                                    <Setter Property="MinHeight" Value="0"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource PrimarySoftBrush}"/>
+                                            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13.5"/>
+                                <TextBlock Text="{Binding Description}"
+                                           Style="{StaticResource Text.Caption}"
+                                           FontWeight="Normal"
+                                           Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- ===================== Report ===================== -->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title + export -->
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{Binding Heading}" Style="{StaticResource Text.Title}"/>
+                    <TextBlock Text="{Binding ReportSubtitle}" Style="{StaticResource Text.Caption}" Margin="0,3,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="Export to Excel (CSV)"
+                        Style="{StaticResource Button.Secondary}"
+                        Command="{Binding ExportCommand}"
+                        VerticalAlignment="Top"/>
+            </Grid>
+
+            <!-- Date controls -->
+            <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,6"
+                            Visibility="{Binding ShowFrom, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="From" VerticalAlignment="Center" Style="{StaticResource Text.FieldLabel}" Margin="0,0,8,0"/>
+                    <DatePicker SelectedDate="{Binding From, Mode=TwoWay}" Width="170" MinHeight="36"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,6"
+                            Visibility="{Binding ShowRange, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="To" VerticalAlignment="Center" Style="{StaticResource Text.FieldLabel}" Margin="0,0,8,0"/>
+                    <DatePicker SelectedDate="{Binding To, Mode=TwoWay}" Width="170" MinHeight="36"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,6"
+                            Visibility="{Binding ShowUpTo, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="Expiring on or before" VerticalAlignment="Center" Style="{StaticResource Text.FieldLabel}" Margin="0,0,8,0"/>
+                    <DatePicker SelectedDate="{Binding To, Mode=TwoWay}" Width="170" MinHeight="36"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,0"
+                            Visibility="{Binding ShowRange, Converter={StaticResource BoolToVisibility}}">
+                    <Button Content="Today" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="today"/>
+                    <Button Content="Yesterday" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="yesterday"/>
+                    <Button Content="Last 7 days" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="7"/>
+                    <Button Content="Last 30 days" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="30"/>
+                    <Button Content="This month" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="month"/>
+                    <Button Content="Last month" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="lastmonth"/>
+                    <Button Content="This year" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="year"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Visibility="{Binding ShowUpTo, Converter={StaticResource BoolToVisibility}}">
+                    <Button Content="30 days" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="d30"/>
+                    <Button Content="60 days" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="d60"/>
+                    <Button Content="90 days" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="d90"/>
+                    <Button Content="180 days" Style="{StaticResource PresetButton}" Command="{Binding PresetCommand}" CommandParameter="d180"/>
+                </StackPanel>
+            </WrapPanel>
+
+            <!-- Messages and headline figures -->
+            <StackPanel Grid.Row="2">
+                <Border Style="{StaticResource ErrorBanner}" Margin="0,0,0,10"
+                        Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
+                </Border>
+                <Border Background="{StaticResource SuccessSoftBrush}"
+                        CornerRadius="{StaticResource RadiusMedium}"
+                        Padding="12,9" Margin="0,0,0,10"
+                        Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource SuccessBrush}"
+                               FontSize="12.5" TextWrapping="Wrap"/>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Totals}" Margin="0,0,0,12">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:TotalCard}">
+                            <Border Style="{StaticResource Card}" Padding="16,10" Margin="0,0,10,0" MinWidth="130">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Label}" FontSize="12"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding Value}" FontSize="18" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Table -->
+            <Grid Grid.Row="3">
+                <DataGrid x:Name="ReportGrid" RowHeight="36"/>
+
+                <TextBlock Text="Nothing to show for this selection."
+                           Style="{StaticResource Text.Body}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0"
+                           Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

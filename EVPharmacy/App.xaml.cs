@@ -21,6 +21,7 @@ public partial class App : Application
 
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         RegisterGlobalExceptionHandlers();
+        AuditInterceptor.ErrorHandler = ex => ErrorLogger.Log(ex, "Audit trail could not be written");
 
         try
         {
@@ -34,6 +35,16 @@ public partial class App : Application
             await _host.Services
                 .GetRequiredService<DatabaseInitializer>()
                 .InitializeAsync();
+
+            // One automatic backup per day. A failure here must never stop the pharmacy opening.
+            try
+            {
+                _host.Services.GetRequiredService<DatabaseBackupService>().CreateAutomaticBackupIfDue();
+            }
+            catch (Exception backupEx)
+            {
+                ErrorLogger.Log(backupEx, "Automatic backup failed");
+            }
 
             var userService = _host.Services.GetRequiredService<UserService>();
 
@@ -81,7 +92,15 @@ public partial class App : Application
     {
         // A factory gives each operation its own short-lived DbContext,
         // avoiding stale data and change-tracker growth in a long-running app.
-        services.AddDbContextFactory<AppDbContext>(AppDatabase.Configure);
+        services.AddSingleton<AuditContextAccessor>();
+        services.AddSingleton<AuditInterceptor>();
+        services.AddSingleton<AuditService>();
+        services.AddSingleton<UserManagementService>();
+        services.AddDbContextFactory<AppDbContext>((sp, options) =>
+        {
+            AppDatabase.Configure(options);
+            options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
+        });
 
         services.AddSingleton<DatabaseBackupService>();
         services.AddSingleton<DatabaseInitializer>();
@@ -90,6 +109,10 @@ public partial class App : Application
         services.AddSingleton<MedicineService>();
         services.AddSingleton<SupplierService>();
         services.AddSingleton<InventoryService>();
+        services.AddSingleton<SalesService>();
+        services.AddSingleton<SettingsService>();
+        services.AddSingleton<ReportService>();
+        services.AddSingleton<ReceiptPrinter>();
         services.AddSingleton<UserSession>();
         services.AddSingleton<DialogService>();
 
@@ -98,6 +121,13 @@ public partial class App : Application
         services.AddTransient<SuppliersViewModel>();
         services.AddTransient<InventoryViewModel>();
         services.AddTransient<ListsViewModel>();
+        services.AddTransient<PosViewModel>();
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<SalesHistoryViewModel>();
+        services.AddTransient<UsersViewModel>();
+        services.AddTransient<AuditLogViewModel>();
+        services.AddTransient<BackupViewModel>();
+        services.AddTransient<ReportsViewModel>();
 
         services.AddTransient<SetupAdminWindow>();
         services.AddTransient<LoginWindow>();

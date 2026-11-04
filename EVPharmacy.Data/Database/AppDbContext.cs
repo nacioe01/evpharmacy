@@ -83,6 +83,7 @@ public partial class AppDbContext : DbContext
 
         ConfigureCatalog(modelBuilder, utcConverter);
         ConfigureInventory(modelBuilder, utcConverter);
+        ConfigureSales(modelBuilder, utcConverter);
     }
 
     private static readonly DateTime SeedDate = new(2026, 11, 4, 0, 0, 0, DateTimeKind.Utc);

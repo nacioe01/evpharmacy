@@ -33,9 +33,12 @@ public class UserService
 
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
-    public UserService(IDbContextFactory<AppDbContext> contextFactory)
+    private readonly AuditService _audit;
+
+    public UserService(IDbContextFactory<AppDbContext> contextFactory, AuditService audit)
     {
         _contextFactory = contextFactory;
+        _audit = audit;
     }
 
     public async Task<bool> AnyUsersExistAsync()
@@ -97,7 +100,34 @@ public class UserService
         return true;
     }
 
-    public async Task<AuthenticationOutcome> AuthenticateAsync(
+    public async Task<AuthenticationOutcome> AuthenticateAsync(string username, string password)
+    {
+        var outcome = await AuthenticateCoreAsync(username, password);
+        var name = username?.Trim() ?? string.Empty;
+
+        // The attempted password is never logged.
+        switch (outcome.Result)
+        {
+            case AuthenticationResult.Success when outcome.User is not null:
+                await _audit.LogEventAsync("Login", $"{outcome.User.Username} signed in",
+                    userId: outcome.User.Id, username: outcome.User.Username);
+                break;
+            case AuthenticationResult.AccountDeactivated:
+                await _audit.LogEventAsync("LoginFailed", $"Sign-in blocked: account \"{name}\" is deactivated", username: name);
+                break;
+            default:
+                if (name.Length > 0)
+                {
+                    await _audit.LogEventAsync("LoginFailed", $"Failed sign-in attempt for \"{name}\"", username: name);
+                }
+
+                break;
+        }
+
+        return outcome;
+    }
+
+    private async Task<AuthenticationOutcome> AuthenticateCoreAsync(
         string username,
         string password)
     {

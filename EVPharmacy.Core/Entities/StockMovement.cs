@@ -40,6 +40,10 @@ public class StockMovement
     public int? StockReceiptId { get; set; }
     public StockReceipt? StockReceipt { get; set; }
 
+    /// <summary>Set for sale and void-return movements.</summary>
+    public int? SaleId { get; set; }
+    public Sale? Sale { get; set; }
+
     public string? Notes { get; set; }
 
     public int? UserId { get; set; }

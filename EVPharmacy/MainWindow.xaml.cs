@@ -1,4 +1,5 @@
 ﻿
+using EVPharmacy.Data.Services;
 using EVPharmacy.Services;
 using EVPharmacy.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,11 @@ public partial class MainWindow : Window
         {
             return;
         }
+
+        // Record the sign-out while the user is still known (fire and forget; never blocks logging out).
+        _ = _serviceProvider.GetRequiredService<AuditService>()
+            .LogEventAsync("Logout", $"{_session.CurrentUser?.Username} signed out",
+                userId: _session.CurrentUser?.Id, username: _session.CurrentUser?.Username);
 
         _session.SignOut();
         Hide();
