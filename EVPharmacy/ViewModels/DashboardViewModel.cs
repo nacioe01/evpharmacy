@@ -21,21 +21,23 @@ public sealed class DashboardViewModel : PageViewModel
     private const int MaxAlerts = 10;
 
     private readonly InventoryService _inventory;
+    private readonly SalesService _sales;
 
     private bool _isLoaded;
     private string _alertSummary = "Low-stock and expiration warnings.";
 
-    public DashboardViewModel(string username, Action<string> navigate, InventoryService inventory)
+    public DashboardViewModel(string username, Action<string> navigate, InventoryService inventory, SalesService sales)
         : base("Dashboard", "Overview of today's pharmacy operations")
     {
         _inventory = inventory;
+        _sales = sales;
 
         Greeting = $"{GetGreeting(DateTime.Now)}, {username}";
         TodayText = DateTime.Now.ToString("dddd, MMMM d, yyyy");
 
         Metrics =
         [
-            new DashboardMetric("Today's sales", "—", "Available once POS is set up", ""),
+            new DashboardMetric("Today's sales", "—", "Completed sales today", ""),
             new DashboardMetric("Medicines", "…", "Active products", ""),
             new DashboardMetric("Low stock", "…", "At or below reorder level", ""),
             new DashboardMetric("Expiring in 90 days", "…", "Medicines with stock expiring", "")
@@ -80,6 +82,7 @@ public sealed class DashboardViewModel : PageViewModel
     {
         try
         {
+            var today0 = await _sales.GetTodaySummaryAsync();
             var stock = await _inventory.GetStockSummaryAsync();
             var batches = await _inventory.GetBatchesAsync();
 
@@ -141,6 +144,11 @@ public sealed class DashboardViewModel : PageViewModel
                     ? $"Showing the {MaxAlerts} most urgent of {ordered.Count} alerts."
                     : $"{ordered.Count} item{(ordered.Count == 1 ? "" : "s")} need attention.";
 
+            Metrics[0] = Metrics[0] with
+            {
+                Value = EVPharmacy.Core.Money.Format(today0.TotalCentavos),
+                Caption = $"{today0.SaleCount:N0} sale{(today0.SaleCount == 1 ? "" : "s")} today"
+            };
             Metrics[1] = Metrics[1] with { Value = stock.Count.ToString("N0") };
             Metrics[2] = Metrics[2] with { Value = stock.Count(s => s.IsLowStock).ToString("N0") };
             Metrics[3] = Metrics[3] with { Value = stock.Count(s => s.ExpiringSoonQuantity > 0).ToString("N0") };

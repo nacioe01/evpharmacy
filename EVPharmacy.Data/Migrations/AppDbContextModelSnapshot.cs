@@ -17,6 +17,62 @@ namespace EVPharmacy.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("action");
+
+                    b.Property<string>("Details")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("details");
+
+                    b.Property<string>("EntityId")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("entity_id");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("entity_type");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("summary");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("user_id");
+
+                    b.Property<string>("Username")
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("username");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccurredAt");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("audit_logs", (string)null);
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -505,6 +561,267 @@ namespace EVPharmacy.Data.Migrations
                     b.ToTable("medicine_price_history", (string)null);
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.Sale", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<long>("AmountTenderedCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("amount_tendered_centavos");
+
+                    b.Property<int?>("CashierUserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("cashier_user_id");
+
+                    b.Property<long>("ChangeCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("change_centavos");
+
+                    b.Property<string>("CustomerIdNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("customer_id_number");
+
+                    b.Property<string>("CustomerName")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("customer_name");
+
+                    b.Property<int>("DiscountBps")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0)
+                        .HasColumnName("discount_bps");
+
+                    b.Property<long>("DiscountCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("discount_centavos");
+
+                    b.Property<string>("DiscountType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("None")
+                        .HasColumnName("discount_type");
+
+                    b.Property<bool>("IsVatRegistered")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_vat_registered");
+
+                    b.Property<long>("NonVatSalesCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("non_vat_sales_centavos");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("payment_method");
+
+                    b.Property<string>("PaymentReference")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("payment_reference");
+
+                    b.Property<string>("ReceiptNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("receipt_number");
+
+                    b.Property<bool>("RxVerified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnName("rx_verified");
+
+                    b.Property<DateTime>("SoldAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("sold_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("status");
+
+                    b.Property<long>("SubtotalCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("subtotal_centavos");
+
+                    b.Property<long>("TotalCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("total_centavos");
+
+                    b.Property<long>("VatAmountCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("vat_amount_centavos");
+
+                    b.Property<long>("VatExemptSalesCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("vat_exempt_sales_centavos");
+
+                    b.Property<int>("VatRateBps")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0)
+                        .HasColumnName("vat_rate_bps");
+
+                    b.Property<long>("VatRemovedCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("vat_removed_centavos");
+
+                    b.Property<long>("VatableSalesCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("vatable_sales_centavos");
+
+                    b.Property<string>("VoidReason")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("void_reason");
+
+                    b.Property<DateTime?>("VoidedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("voided_at");
+
+                    b.Property<int?>("VoidedByUserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("voided_by_user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashierUserId");
+
+                    b.HasIndex("ReceiptNumber")
+                        .IsUnique();
+
+                    b.HasIndex("SoldAt");
+
+                    b.HasIndex("VoidedByUserId");
+
+                    b.ToTable("sales", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_sales_amounts", "subtotal_centavos >= 0 AND total_centavos >= 0 AND amount_tendered_centavos >= total_centavos AND change_centavos >= 0");
+
+                            t.HasCheckConstraint("CK_sales_discount_type", "discount_type IN ('None', 'SeniorCitizen', 'Pwd')");
+
+                            t.HasCheckConstraint("CK_sales_payment", "payment_method IN ('Cash', 'Card', 'EWallet')");
+
+                            t.HasCheckConstraint("CK_sales_status", "status IN ('Completed', 'Voided')");
+                        });
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.SaleItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int>("BatchId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("batch_id");
+
+                    b.Property<long>("DiscountCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("discount_centavos");
+
+                    b.Property<bool>("IsVatExempt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_vat_exempt");
+
+                    b.Property<long>("LineTotalCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("line_total_centavos");
+
+                    b.Property<int>("MedicineId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("medicine_id");
+
+                    b.Property<string>("MedicineName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("medicine_name");
+
+                    b.Property<long>("NetCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("net_centavos");
+
+                    b.Property<string>("PrescriptionClass")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("prescription_class");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("quantity");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sale_id");
+
+                    b.Property<long>("UnitCostCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("unit_cost_centavos");
+
+                    b.Property<long>("UnitPriceCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("unit_price_centavos");
+
+                    b.Property<long>("VatAmountCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("vat_amount_centavos");
+
+                    b.Property<long>("VatRemovedCentavos")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("vat_removed_centavos");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("MedicineId");
+
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("sale_items", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_sale_items_money", "unit_price_centavos >= 0 AND unit_cost_centavos >= 0 AND line_total_centavos >= 0");
+
+                            t.HasCheckConstraint("CK_sale_items_qty", "quantity > 0");
+                        });
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.StockMovement", b =>
                 {
                     b.Property<int>("Id")
@@ -548,6 +865,10 @@ namespace EVPharmacy.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("quantity_change");
 
+                    b.Property<int?>("SaleId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sale_id");
+
                     b.Property<int?>("StockReceiptId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("stock_receipt_id");
@@ -559,6 +880,8 @@ namespace EVPharmacy.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BatchId");
+
+                    b.HasIndex("SaleId");
 
                     b.HasIndex("StockReceiptId");
 
@@ -622,6 +945,89 @@ namespace EVPharmacy.Data.Migrations
                     b.ToTable("stock_receipts", null, t =>
                         {
                             t.HasCheckConstraint("CK_stock_receipts_type", "receipt_type IN ('Delivery', 'OpeningBalance')");
+                        });
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.StoreSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("address");
+
+                    b.Property<string>("ContactNumber")
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("contact_number");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("is_confirmed");
+
+                    b.Property<bool>("IsVatRegistered")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("is_vat_registered");
+
+                    b.Property<string>("PermitInfo")
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("permit_info");
+
+                    b.Property<int>("PwdDiscountBps")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("pwd_discount_bps");
+
+                    b.Property<string>("ReceiptFooter")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("receipt_footer");
+
+                    b.Property<int>("SeniorDiscountBps")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("senior_discount_bps");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("store_name");
+
+                    b.Property<string>("Tin")
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("tin");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("VatRateBps")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("vat_rate_bps");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("store_settings", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_store_settings_rates", "vat_rate_bps BETWEEN 0 AND 10000 AND senior_discount_bps BETWEEN 0 AND 10000 AND pwd_discount_bps BETWEEN 0 AND 10000");
+
+                            t.HasCheckConstraint("CK_store_settings_singleton", "id = 1");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsConfirmed = false,
+                            IsVatRegistered = true,
+                            PwdDiscountBps = 2000,
+                            SeniorDiscountBps = 2000,
+                            StoreName = "EV Pharmacy",
+                            VatRateBps = 1200
                         });
                 });
 
@@ -821,6 +1227,16 @@ namespace EVPharmacy.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.AuditLog", b =>
+                {
+                    b.HasOne("EVPharmacy.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.InventoryBatch", b =>
                 {
                     b.HasOne("EVPharmacy.Core.Entities.Medicine", "Medicine")
@@ -884,6 +1300,50 @@ namespace EVPharmacy.Data.Migrations
                     b.Navigation("Medicine");
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.Sale", b =>
+                {
+                    b.HasOne("EVPharmacy.Core.Entities.User", "CashierUser")
+                        .WithMany()
+                        .HasForeignKey("CashierUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("EVPharmacy.Core.Entities.User", "VoidedByUser")
+                        .WithMany()
+                        .HasForeignKey("VoidedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CashierUser");
+
+                    b.Navigation("VoidedByUser");
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.SaleItem", b =>
+                {
+                    b.HasOne("EVPharmacy.Core.Entities.InventoryBatch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EVPharmacy.Core.Entities.Medicine", "Medicine")
+                        .WithMany()
+                        .HasForeignKey("MedicineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EVPharmacy.Core.Entities.Sale", "Sale")
+                        .WithMany("Items")
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Medicine");
+
+                    b.Navigation("Sale");
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.StockMovement", b =>
                 {
                     b.HasOne("EVPharmacy.Core.Entities.InventoryBatch", "Batch")
@@ -898,6 +1358,11 @@ namespace EVPharmacy.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("EVPharmacy.Core.Entities.Sale", "Sale")
+                        .WithMany()
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("EVPharmacy.Core.Entities.StockReceipt", "StockReceipt")
                         .WithMany()
                         .HasForeignKey("StockReceiptId")
@@ -911,6 +1376,8 @@ namespace EVPharmacy.Data.Migrations
                     b.Navigation("Batch");
 
                     b.Navigation("Medicine");
+
+                    b.Navigation("Sale");
 
                     b.Navigation("StockReceipt");
 
@@ -937,6 +1404,11 @@ namespace EVPharmacy.Data.Migrations
             modelBuilder.Entity("EVPharmacy.Core.Entities.Medicine", b =>
                 {
                     b.Navigation("PriceHistory");
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.Sale", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("EVPharmacy.Core.Entities.StockReceipt", b =>

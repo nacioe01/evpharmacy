@@ -94,15 +94,17 @@ public sealed class MainViewModel : ObservableObject
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.Dashboard, "Dashboard", "",
-            () => new DashboardViewModel(Username, NavigateTo, _services.GetRequiredService<InventoryService>()),
+            () => new DashboardViewModel(Username, NavigateTo, _services.GetRequiredService<InventoryService>(), _services.GetRequiredService<SalesService>()),
             section: "OVERVIEW"));
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.PointOfSale, "Point of Sale", "",
-            () => Planned("Point of Sale", "Sell medicines quickly and accurately", "",
-                "Barcode scanning, cart, FEFO stock selection, payments and receipts.",
-                "Phase 4"),
+            () => _services.GetRequiredService<PosViewModel>(),
             section: "OPERATIONS"));
+
+        NavigationItems.Add(new NavigationItem(
+            PageKeys.SalesHistory, "Sales history", "",
+            () => _services.GetRequiredService<SalesHistoryViewModel>()));
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.Medicines, "Medicines", "",
@@ -120,26 +122,29 @@ public sealed class MainViewModel : ObservableObject
             PageKeys.Lists, "Catalog lists", "",
             () => _services.GetRequiredService<ListsViewModel>()));
 
-        NavigationItems.Add(new NavigationItem(
-            PageKeys.Reports, "Reports", "",
-            () => Planned("Reports", "Sales and inventory insights", "",
-                "Sales summaries, inventory valuation, expiry and stock movement reports.",
-                "Phase 8")));
-
         if (_session.IsAdmin)
         {
+            // Reports show margins and stock value, so they are for administrators.
+            NavigationItems.Add(new NavigationItem(
+                PageKeys.Reports, "Reports", "",
+                () => _services.GetRequiredService<ReportsViewModel>()));
+
             NavigationItems.Add(new NavigationItem(
                 PageKeys.Users, "Users", "",
-                () => Planned("Users", "Staff accounts and roles", "",
-                    "Create staff accounts, assign roles and review audit logs.",
-                    "Phase 7"),
+                () => _services.GetRequiredService<UsersViewModel>(),
                 section: "ADMINISTRATION"));
 
             NavigationItems.Add(new NavigationItem(
+                PageKeys.AuditLog, "Audit log", "",
+                () => _services.GetRequiredService<AuditLogViewModel>()));
+
+            NavigationItems.Add(new NavigationItem(
+                PageKeys.Backup, "Backup and restore", "",
+                () => _services.GetRequiredService<BackupViewModel>()));
+
+            NavigationItems.Add(new NavigationItem(
                 PageKeys.Settings, "Settings", "",
-                () => Planned("Settings", "Store, tax and backup settings", "",
-                    "Store details, VAT and discount rules, receipt setup and database backup.",
-                    "Phase 5 and 7")));
+                () => _services.GetRequiredService<SettingsViewModel>()));
         }
     }
 

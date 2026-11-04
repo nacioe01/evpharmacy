@@ -5,10 +5,13 @@ public static class PageKeys
 {
     public const string Dashboard = "dashboard";
     public const string PointOfSale = "pos";
+    public const string SalesHistory = "saleshistory";
     public const string Medicines = "medicines";
     public const string Inventory = "inventory";
     public const string Suppliers = "suppliers";
     public const string Lists = "lists";
+    public const string AuditLog = "auditlog";
+    public const string Backup = "backup";
     public const string Reports = "reports";
     public const string Users = "users";
     public const string Settings = "settings";

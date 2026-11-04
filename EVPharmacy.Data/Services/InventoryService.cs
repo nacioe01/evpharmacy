@@ -469,7 +469,7 @@ public class InventoryService
         var movement = new StockMovement
         {
             MedicineId = batch.MedicineId,
-            BatchId = batch.Id,
+            Batch = batch,
             MovementType = MovementType.Adjustment,
             QuantityChange = input.QuantityChange,
             BalanceAfter = newBalance,

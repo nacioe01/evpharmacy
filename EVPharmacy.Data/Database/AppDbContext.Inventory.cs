@@ -110,6 +110,7 @@ public partial class AppDbContext
             entity.Property(m => m.AdjustmentReason).HasColumnName("adjustment_reason")
                 .HasMaxLength(30).HasConversion<string>();
             entity.Property(m => m.StockReceiptId).HasColumnName("stock_receipt_id");
+            entity.Property(m => m.SaleId).HasColumnName("sale_id");
             entity.Property(m => m.Notes).HasColumnName("notes").HasMaxLength(StockMovement.MaxNotesLength);
             entity.Property(m => m.UserId).HasColumnName("user_id");
             entity.Property(m => m.CreatedAt).HasColumnName("created_at").HasConversion(utcConverter);
@@ -121,6 +122,8 @@ public partial class AppDbContext
                 .HasForeignKey(m => m.MedicineId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(m => m.Batch).WithMany()
                 .HasForeignKey(m => m.BatchId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(m => m.Sale).WithMany()
+                .HasForeignKey(m => m.SaleId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(m => m.StockReceipt).WithMany()
                 .HasForeignKey(m => m.StockReceiptId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(m => m.User).WithMany()
