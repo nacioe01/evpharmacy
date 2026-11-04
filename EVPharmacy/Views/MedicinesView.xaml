@@ -89,16 +89,31 @@
                           ItemsSource="{Binding Items}"
                           MouseDoubleClick="OnRowDoubleClick">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="GENERIC NAME" Binding="{Binding GenericName}" Width="1.3*"/>
-                        <DataGridTextColumn Header="BRAND" Binding="{Binding BrandName}" Width="1.2*"/>
-                        <DataGridTextColumn Header="STRENGTH" Binding="{Binding Strength}" Width="Auto"/>
-                        <DataGridTextColumn Header="FORM" Binding="{Binding DosageForm}" Width="Auto"/>
-                        <DataGridTextColumn Header="CATEGORY" Binding="{Binding Category}" Width="1.5*"/>
-                        <DataGridTextColumn Header="TYPE" Binding="{Binding Prescription}" Width="Auto"/>
-                        <DataGridTextColumn Header="COST" Binding="{Binding Cost}" Width="Auto"/>
-                        <DataGridTextColumn Header="PRICE" Binding="{Binding Price}" Width="Auto"/>
-                        <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="Auto"/>
-                        <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn Header="MEDICINE" Width="1.5*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type vm:MedicineRow}">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding GenericName}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Detail}" Style="{StaticResource Text.Caption}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="BRAND" Binding="{Binding BrandName}" Width="1*"/>
+                        <DataGridTextColumn Header="CATEGORY" Binding="{Binding Category}" Width="1.2*"/>
+                        <DataGridTextColumn Header="TYPE" Binding="{Binding Prescription}" Width="80"/>
+                        <DataGridTextColumn Header="COST" Binding="{Binding Cost}" Width="85"/>
+                        <DataGridTextColumn Header="PRICE" Binding="{Binding Price}" Width="85"/>
+                        <DataGridTemplateColumn Header="STATUS" Width="90">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type vm:MedicineRow}">
+                                    <Border Style="{StaticResource Pill}" Tag="{Binding Kind}">
+                                        <TextBlock Text="{Binding Status}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="185">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type vm:MedicineRow}">
                                     <StackPanel Orientation="Horizontal">

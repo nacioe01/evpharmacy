@@ -8,6 +8,7 @@ public static class PageKeys
     public const string Medicines = "medicines";
     public const string Inventory = "inventory";
     public const string Suppliers = "suppliers";
+    public const string Lists = "lists";
     public const string Reports = "reports";
     public const string Users = "users";
     public const string Settings = "settings";

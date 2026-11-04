@@ -8,6 +8,10 @@
              d:DataContext="{d:DesignInstance Type=vm:DashboardViewModel}"
              d:DesignWidth="960" d:DesignHeight="640">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="32,28,32,32">
 
@@ -117,17 +121,60 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel>
-                            <TextBlock Text="Alerts" Style="{StaticResource Text.Subtitle}"/>
-                            <TextBlock Text="Low-stock and expiration warnings."
-                                       Style="{StaticResource Text.Caption}"
-                                       Margin="0,4,0,0"/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Alerts" Style="{StaticResource Text.Subtitle}"/>
+                                <TextBlock Text="{Binding AlertSummary}"
+                                           Style="{StaticResource Text.Caption}"
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Content="View inventory"
+                                    Style="{StaticResource Button.Soft}"
+                                    MinHeight="34"
+                                    Padding="14,0"
+                                    Command="{Binding ViewInventoryCommand}"
+                                    VerticalAlignment="Top"
+                                    Visibility="{Binding HasAlerts, Converter={StaticResource BoolToVisibility}}"/>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="1"
+                                      ItemsSource="{Binding Alerts}"
+                                      Margin="0,14,0,0"
+                                      Visibility="{Binding HasAlerts, Converter={StaticResource BoolToVisibility}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:AlertRow}">
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="112"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource Pill}" Tag="{Binding Kind}"
+                                                VerticalAlignment="Top" Margin="0,1,0,0">
+                                            <TextBlock Text="{Binding Label}"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Title}"
+                                                       FontWeight="SemiBold"
+                                                       FontSize="13.5"
+                                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Detail}" Style="{StaticResource Text.Caption}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
                         <StackPanel Grid.Row="1"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Margin="0,24">
+                                    Margin="0,24"
+                                    Visibility="{Binding IsAllClear, Converter={StaticResource BoolToVisibility}}">
                             <Border Style="{StaticResource IconBadge}" Width="48" Height="48" CornerRadius="24">
                                 <TextBlock Text="&#xE73E;" Style="{StaticResource Text.Icon}" FontSize="18"/>
                             </Border>
@@ -135,7 +182,7 @@
                                        Style="{StaticResource Text.Subtitle}"
                                        HorizontalAlignment="Center"
                                        Margin="0,12,0,4"/>
-                            <TextBlock Text="Alerts will appear here once medicines and stock batches are recorded."
+                            <TextBlock Text="No low-stock, expiring, expired or recalled stock right now."
                                        Style="{StaticResource Text.Caption}"
                                        TextAlignment="Center"
                                        MaxWidth="300"/>

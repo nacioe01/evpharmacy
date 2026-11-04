@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EVPharmacy.Data.Database;
 
-public class AppDbContext : DbContext
+public partial class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -18,6 +18,10 @@ public class AppDbContext : DbContext
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
     public DbSet<Medicine> Medicines => Set<Medicine>();
     public DbSet<MedicinePriceHistory> MedicinePriceHistories => Set<MedicinePriceHistory>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<StockReceipt> StockReceipts => Set<StockReceipt>();
+    public DbSet<InventoryBatch> InventoryBatches => Set<InventoryBatch>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -78,6 +82,7 @@ public class AppDbContext : DbContext
         });
 
         ConfigureCatalog(modelBuilder, utcConverter);
+        ConfigureInventory(modelBuilder, utcConverter);
     }
 
     private static readonly DateTime SeedDate = new(2026, 11, 4, 0, 0, 0, DateTimeKind.Utc);

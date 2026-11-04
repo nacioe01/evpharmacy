@@ -13,7 +13,7 @@
     <StackPanel Margin="24">
         <TextBlock x:Name="LabelText" Style="{StaticResource Text.FieldLabel}"/>
 
-        <TextBox x:Name="InputBox" MaxLength="60"/>
+        <TextBox x:Name="InputBox"/>
 
         <Border x:Name="ErrorBox"
                 Style="{StaticResource ErrorBanner}"
@@ -29,7 +29,7 @@
                     Style="{StaticResource Button.Secondary}"
                     IsCancel="True"
                     MinWidth="90"/>
-            <Button Content="Add"
+            <Button x:Name="AcceptButton" Content="Add"
                     Style="{StaticResource Button.Primary}"
                     IsDefault="True"
                     Click="OnAccept"

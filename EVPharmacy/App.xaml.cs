@@ -88,11 +88,16 @@ public partial class App : Application
         services.AddSingleton<UserService>();
         services.AddSingleton<LookupService>();
         services.AddSingleton<MedicineService>();
+        services.AddSingleton<SupplierService>();
+        services.AddSingleton<InventoryService>();
         services.AddSingleton<UserSession>();
         services.AddSingleton<DialogService>();
 
         services.AddTransient<MainViewModel>();
         services.AddTransient<MedicinesViewModel>();
+        services.AddTransient<SuppliersViewModel>();
+        services.AddTransient<InventoryViewModel>();
+        services.AddTransient<ListsViewModel>();
 
         services.AddTransient<SetupAdminWindow>();
         services.AddTransient<LoginWindow>();

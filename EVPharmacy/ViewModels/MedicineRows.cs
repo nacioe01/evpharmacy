@@ -41,6 +41,8 @@ public sealed class MedicineRow
     public int ReorderLevel => Item.ReorderLevel;
     public bool IsActive => Item.IsActive;
     public string Status => Item.IsActive ? "Active" : "Inactive";
+    public string Kind => Item.IsActive ? StatusKind.Good : StatusKind.Neutral;
+    public string Detail => string.Join(" · ", new[] { Item.Strength, Item.DosageFormName }.Where(s => !string.IsNullOrWhiteSpace(s)));
     public string ToggleActiveText => Item.IsActive ? "Deactivate" : "Reactivate";
 }
 

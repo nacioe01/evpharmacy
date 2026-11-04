@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EVPharmacy.Data.Services;
 
+/// <summary>One lookup entry plus how many medicines use it.</summary>
+public sealed record LookupEntry(int Id, string Name, bool IsActive, int MedicineCount);
+
 /// <summary>
 /// Maintains the admin-managed lists (categories, dosage forms, units of measure).
 /// Entries are deactivated, never deleted, so older records stay meaningful.
@@ -27,6 +30,28 @@ public class LookupService
             .Where(x => includeInactive || x.IsActive)
             .OrderBy(x => x.Name)
             .ToListAsync();
+    }
+
+    /// <summary>All entries (active and inactive) with the number of medicines using each.</summary>
+    public async Task<List<LookupEntry>> GetEntriesAsync<T>() where T : LookupItem
+    {
+        await using var db = await _contextFactory.CreateDbContextAsync();
+
+        var items = await db.Set<T>().AsNoTracking().OrderBy(x => x.Name).ToListAsync();
+
+        var medicines = db.Medicines.AsNoTracking();
+        var counts = typeof(T) == typeof(Category)
+            ? await medicines.GroupBy(m => m.CategoryId)
+                .Select(g => new { Id = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Id, x => x.Count)
+            : typeof(T) == typeof(DosageForm)
+                ? await medicines.GroupBy(m => m.DosageFormId)
+                    .Select(g => new { Id = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Id, x => x.Count)
+                : await medicines.GroupBy(m => m.UnitOfMeasureId)
+                    .Select(g => new { Id = g.Key, Count = g.Count() }).ToDictionaryAsync(x => x.Id, x => x.Count);
+
+        return items
+            .Select(i => new LookupEntry(i.Id, i.Name, i.IsActive, counts.GetValueOrDefault(i.Id)))
+            .ToList();
     }
 
     public async Task<OperationResult> AddAsync<T>(string? name) where T : LookupItem, new()

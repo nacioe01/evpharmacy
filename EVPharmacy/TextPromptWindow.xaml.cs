@@ -4,12 +4,16 @@ namespace EVPharmacy;
 
 public partial class TextPromptWindow : Window
 {
-    public TextPromptWindow(string title, string label, string? initialValue, string? errorMessage)
+    public TextPromptWindow(
+        string title, string label, string? initialValue, string? errorMessage,
+        string acceptText = "Add", int maxLength = 60)
     {
         InitializeComponent();
 
         Title = title;
         LabelText.Text = label;
+        AcceptButton.Content = acceptText;
+        InputBox.MaxLength = maxLength;
         InputBox.Text = initialValue ?? string.Empty;
 
         if (!string.IsNullOrEmpty(errorMessage))

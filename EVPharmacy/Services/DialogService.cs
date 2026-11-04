@@ -10,13 +10,15 @@ public class DialogService
         string title,
         string label,
         string? initialValue = null,
-        string? errorMessage = null)
+        string? errorMessage = null,
+        string acceptText = "Add",
+        int maxLength = 60)
     {
         var owner = Application.Current.Windows
             .OfType<Window>()
             .FirstOrDefault(w => w.IsActive) ?? Application.Current.MainWindow;
 
-        var window = new TextPromptWindow(title, label, initialValue, errorMessage)
+        var window = new TextPromptWindow(title, label, initialValue, errorMessage, acceptText, maxLength)
         {
             Owner = owner
         };

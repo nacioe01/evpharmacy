@@ -1,4 +1,5 @@
 
+using EVPharmacy.Data.Services;
 using EVPharmacy.Mvvm;
 using EVPharmacy.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -93,7 +94,7 @@ public sealed class MainViewModel : ObservableObject
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.Dashboard, "Dashboard", "",
-            () => new DashboardViewModel(Username, NavigateTo),
+            () => new DashboardViewModel(Username, NavigateTo, _services.GetRequiredService<InventoryService>()),
             section: "OVERVIEW"));
 
         NavigationItems.Add(new NavigationItem(
@@ -109,15 +110,15 @@ public sealed class MainViewModel : ObservableObject
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.Inventory, "Inventory", "",
-            () => Planned("Inventory", "Batches, expiry and stock movements", "",
-                "Stock receiving, batch and lot tracking, expiration monitoring and movement history.",
-                "Phase 2")));
+            () => _services.GetRequiredService<InventoryViewModel>()));
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.Suppliers, "Suppliers", "",
-            () => Planned("Suppliers", "Supplier directory", "",
-                "Supplier contacts linked to stock receiving and batches.",
-                "Phase 1")));
+            () => _services.GetRequiredService<SuppliersViewModel>()));
+
+        NavigationItems.Add(new NavigationItem(
+            PageKeys.Lists, "Catalog lists", "",
+            () => _services.GetRequiredService<ListsViewModel>()));
 
         NavigationItems.Add(new NavigationItem(
             PageKeys.Reports, "Reports", "",

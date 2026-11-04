@@ -273,6 +273,82 @@ namespace EVPharmacy.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.InventoryBatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("BatchNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("batch_number")
+                        .UseCollation("NOCASE");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateOnly>("ExpiryDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("expiry_date");
+
+                    b.Property<int>("MedicineId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("medicine_id");
+
+                    b.Property<int>("QuantityOnHand")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("quantity_on_hand");
+
+                    b.Property<int>("QuantityReceived")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("quantity_received");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("status");
+
+                    b.Property<string>("StatusNote")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("status_note");
+
+                    b.Property<int?>("StockReceiptId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("stock_receipt_id");
+
+                    b.Property<long>("UnitCostCentavos")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("unit_cost_centavos");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StockReceiptId");
+
+                    b.HasIndex("MedicineId", "BatchNumber")
+                        .IsUnique();
+
+                    b.HasIndex("MedicineId", "ExpiryDate");
+
+                    b.ToTable("inventory_batches", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_inventory_batches_cost", "unit_cost_centavos >= 0");
+
+                            t.HasCheckConstraint("CK_inventory_batches_qty", "quantity_on_hand >= 0 AND quantity_received >= 0");
+
+                            t.HasCheckConstraint("CK_inventory_batches_status", "status IN ('Available', 'Quarantined', 'Recalled')");
+                        });
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.Medicine", b =>
                 {
                     b.Property<int>("Id")
@@ -429,6 +505,182 @@ namespace EVPharmacy.Data.Migrations
                     b.ToTable("medicine_price_history", (string)null);
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.StockMovement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("AdjustmentReason")
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("adjustment_reason");
+
+                    b.Property<int>("BalanceAfter")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("balance_after");
+
+                    b.Property<int>("BatchId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("batch_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("MedicineId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("medicine_id");
+
+                    b.Property<string>("MovementType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("movement_type");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<int>("QuantityChange")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("quantity_change");
+
+                    b.Property<int?>("StockReceiptId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("stock_receipt_id");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("StockReceiptId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("MedicineId", "CreatedAt");
+
+                    b.ToTable("stock_movements", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_stock_movements_type", "movement_type IN ('OpeningBalance', 'Receipt', 'Sale', 'Adjustment', 'Return')");
+                        });
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.StockReceipt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("InvoiceNumber")
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("invoice_number");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("ReceiptType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("receipt_type");
+
+                    b.Property<int?>("ReceivedByUserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("received_by_user_id");
+
+                    b.Property<DateOnly>("ReceivedDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("received_date");
+
+                    b.Property<int?>("SupplierId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("supplier_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceivedByUserId");
+
+                    b.HasIndex("ReceivedDate");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("stock_receipts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_stock_receipts_type", "receipt_type IN ('Delivery', 'OpeningBalance')");
+                        });
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.Supplier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("address");
+
+                    b.Property<string>("ContactPerson")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("contact_person");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("email");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name")
+                        .UseCollation("NOCASE");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("phone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("suppliers", (string)null);
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.UnitOfMeasure", b =>
                 {
                     b.Property<int>("Id")
@@ -569,6 +821,24 @@ namespace EVPharmacy.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.InventoryBatch", b =>
+                {
+                    b.HasOne("EVPharmacy.Core.Entities.Medicine", "Medicine")
+                        .WithMany()
+                        .HasForeignKey("MedicineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EVPharmacy.Core.Entities.StockReceipt", "StockReceipt")
+                        .WithMany("Batches")
+                        .HasForeignKey("StockReceiptId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Medicine");
+
+                    b.Navigation("StockReceipt");
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.Medicine", b =>
                 {
                     b.HasOne("EVPharmacy.Core.Entities.Category", "Category")
@@ -614,9 +884,64 @@ namespace EVPharmacy.Data.Migrations
                     b.Navigation("Medicine");
                 });
 
+            modelBuilder.Entity("EVPharmacy.Core.Entities.StockMovement", b =>
+                {
+                    b.HasOne("EVPharmacy.Core.Entities.InventoryBatch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EVPharmacy.Core.Entities.Medicine", "Medicine")
+                        .WithMany()
+                        .HasForeignKey("MedicineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EVPharmacy.Core.Entities.StockReceipt", "StockReceipt")
+                        .WithMany()
+                        .HasForeignKey("StockReceiptId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("EVPharmacy.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Medicine");
+
+                    b.Navigation("StockReceipt");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.StockReceipt", b =>
+                {
+                    b.HasOne("EVPharmacy.Core.Entities.User", "ReceivedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReceivedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("EVPharmacy.Core.Entities.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ReceivedByUser");
+
+                    b.Navigation("Supplier");
+                });
+
             modelBuilder.Entity("EVPharmacy.Core.Entities.Medicine", b =>
                 {
                     b.Navigation("PriceHistory");
+                });
+
+            modelBuilder.Entity("EVPharmacy.Core.Entities.StockReceipt", b =>
+                {
+                    b.Navigation("Batches");
                 });
 #pragma warning restore 612, 618
         }

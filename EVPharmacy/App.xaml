@@ -23,6 +23,30 @@
                 <views:MedicineFormView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vm:SuppliersViewModel}">
+                <views:SuppliersView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:SupplierFormViewModel}">
+                <views:SupplierFormView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:InventoryViewModel}">
+                <views:InventoryView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:ReceiveStockViewModel}">
+                <views:ReceiveStockView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:AdjustStockViewModel}">
+                <views:AdjustStockView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:ListsViewModel}">
+                <views:ListsView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type vm:PlaceholderViewModel}">
                 <views:PlaceholderView/>
             </DataTemplate>
