@@ -1,30 +1,22 @@
 ﻿
-using EVPharmacy.Data.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.IO;
 
 namespace EVPharmacy.Data.Database;
 
+/// <summary>
+/// Used only by EF Core tooling (migrations) at design time.
+/// </summary>
 public class AppDbContextFactory
     : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        var appDataPath = Path.Combine(
-            Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData),
-            "EVPharmacy");
+        AppDatabase.EnsureDirectories();
 
-        Directory.CreateDirectory(appDataPath);
+        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        AppDatabase.Configure(optionsBuilder);
 
-        var dbPath = Path.Combine(appDataPath, "pharmacy.db");
-
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseSqlite($"Data Source={dbPath}")
-            .Options;
-
-        return new AppDbContext(options);
+        return new AppDbContext(optionsBuilder.Options);
     }
 }

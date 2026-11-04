@@ -1,0 +1,352 @@
+<UserControl x:Class="EVPharmacy.Views.MedicineFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:EVPharmacy.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:MedicineFormViewModel}"
+             d:DesignWidth="960" d:DesignHeight="900">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <DataTemplate x:Key="NameTemplate">
+            <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="LabelTemplate">
+            <TextBlock Text="{Binding Label}"/>
+        </DataTemplate>
+
+        <Style x:Key="FieldGroup" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,18"/>
+        </Style>
+
+        <Style x:Key="AddButton" TargetType="Button" BasedOn="{StaticResource Button.Soft}">
+            <Setter Property="Width" Value="42"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="Content" Value="+"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Margin="32,22,32,0">
+            <Button Style="{StaticResource Button.Ghost}"
+                    Command="{Binding CancelCommand}"
+                    Content="←  Back to medicines"
+                    HorizontalAlignment="Left"
+                    MinHeight="34"
+                    Padding="10,0"/>
+            <TextBlock Text="{Binding Title}"
+                       Style="{StaticResource Text.Title}"
+                       Margin="0,8,0,0"/>
+            <TextBlock Text="Fields marked * are required."
+                       Style="{StaticResource Text.Caption}"
+                       Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="32,16,32,24">
+
+                <Border Style="{StaticResource ErrorBanner}"
+                        Margin="0,0,0,16"
+                        Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- ===== Identification ===== -->
+                <Border Style="{StaticResource Card}" Padding="24,22,24,6">
+                    <StackPanel>
+                        <TextBlock Text="Identification" Style="{StaticResource Text.Subtitle}" Margin="0,0,0,16"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Generic name *" Style="{StaticResource Text.FieldLabel}"/>
+                                <TextBox Text="{Binding GenericName, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="120"
+                                         AutomationProperties.Name="Generic name"/>
+                                <TextBlock Text="{Binding GenericNameError}" Style="{StaticResource Text.FieldError}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Brand name" Style="{StaticResource Text.FieldLabel}"/>
+                                <TextBox Text="{Binding BrandName, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="120"
+                                         AutomationProperties.Name="Brand name"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Style="{StaticResource FieldGroup}" Width="420" HorizontalAlignment="Left">
+                            <TextBlock Text="Barcode" Style="{StaticResource Text.FieldLabel}"/>
+                            <TextBox Text="{Binding Barcode, UpdateSourceTrigger=PropertyChanged}"
+                                     MaxLength="50"
+                                     AutomationProperties.Name="Barcode"/>
+                            <TextBlock Text="Scan or type the code. Optional."
+                                       Style="{StaticResource Text.Caption}"
+                                       Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Classification ===== -->
+                <Border Style="{StaticResource Card}" Padding="24,22,24,6" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Classification" Style="{StaticResource Text.Subtitle}" Margin="0,0,0,16"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Category *" Style="{StaticResource Text.FieldLabel}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding Categories}"
+                                              ItemTemplate="{StaticResource NameTemplate}"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding CategoryId, Mode=TwoWay}"
+                                              AutomationProperties.Name="Category"/>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource AddButton}"
+                                            Command="{Binding AddCategoryCommand}"
+                                            ToolTip="Add a new category"
+                                            AutomationProperties.Name="Add category"/>
+                                </Grid>
+                                <TextBlock Text="{Binding CategoryError}" Style="{StaticResource Text.FieldError}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Dosage form *" Style="{StaticResource Text.FieldLabel}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding DosageForms}"
+                                              ItemTemplate="{StaticResource NameTemplate}"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding DosageFormId, Mode=TwoWay}"
+                                              AutomationProperties.Name="Dosage form"/>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource AddButton}"
+                                            Command="{Binding AddDosageFormCommand}"
+                                            ToolTip="Add a new dosage form"
+                                            AutomationProperties.Name="Add dosage form"/>
+                                </Grid>
+                                <TextBlock Text="{Binding DosageFormError}" Style="{StaticResource Text.FieldError}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Strength" Style="{StaticResource Text.FieldLabel}"/>
+                                <TextBox Text="{Binding Strength, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="40"
+                                         AutomationProperties.Name="Strength"/>
+                                <TextBlock Text="For example 500 mg or 250 mg/5 mL"
+                                           Style="{StaticResource Text.Caption}"
+                                           Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Unit of measure *" Style="{StaticResource Text.FieldLabel}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox ItemsSource="{Binding Units}"
+                                              ItemTemplate="{StaticResource NameTemplate}"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding UnitId, Mode=TwoWay}"
+                                              AutomationProperties.Name="Unit of measure"/>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource AddButton}"
+                                            Command="{Binding AddUnitCommand}"
+                                            ToolTip="Add a new unit of measure"
+                                            AutomationProperties.Name="Add unit of measure"/>
+                                </Grid>
+                                <TextBlock Text="{Binding UnitError}" Style="{StaticResource Text.FieldError}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Prescription classification *" Style="{StaticResource Text.FieldLabel}"/>
+                                <ComboBox ItemsSource="{Binding PrescriptionOptions}"
+                                          ItemTemplate="{StaticResource LabelTemplate}"
+                                          SelectedValuePath="Value"
+                                          SelectedValue="{Binding PrescriptionClass, Mode=TwoWay}"
+                                          AutomationProperties.Name="Prescription classification"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Tax" Style="{StaticResource Text.FieldLabel}"/>
+                                <CheckBox Content="VAT-exempt item"
+                                          IsChecked="{Binding IsVatExempt}"
+                                          Margin="0,10,0,0"/>
+                                <TextBlock Text="Leave unchecked unless this product is confirmed VAT-exempt."
+                                           Style="{StaticResource Text.Caption}"
+                                           Margin="30,5,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Pricing ===== -->
+                <Border Style="{StaticResource Card}" Padding="24,22,24,6" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Pricing and stock level" Style="{StaticResource Text.Subtitle}" Margin="0,0,0,16"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Purchase cost (₱) *" Style="{StaticResource Text.FieldLabel}"/>
+                                <TextBox Text="{Binding CostText, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="14"
+                                         AutomationProperties.Name="Purchase cost"/>
+                                <TextBlock Text="{Binding CostError}" Style="{StaticResource Text.FieldError}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Selling price (₱) *" Style="{StaticResource Text.FieldLabel}"/>
+                                <TextBox Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="14"
+                                         AutomationProperties.Name="Selling price"/>
+                                <TextBlock Text="{Binding PriceError}" Style="{StaticResource Text.FieldError}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4" Style="{StaticResource FieldGroup}">
+                                <TextBlock Text="Reorder level *" Style="{StaticResource Text.FieldLabel}"/>
+                                <TextBox Text="{Binding ReorderText, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="7"
+                                         AutomationProperties.Name="Reorder level"/>
+                                <TextBlock Text="{Binding ReorderError}" Style="{StaticResource Text.FieldError}"/>
+                                <TextBlock Text="Low-stock alert threshold"
+                                           Style="{StaticResource Text.Caption}"
+                                           Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="{Binding MarginText}"
+                                   Style="{StaticResource Text.Caption}"
+                                   Margin="0,-6,0,14"/>
+
+                        <Border Style="{StaticResource ErrorBanner}"
+                                Margin="0,0,0,18"
+                                Visibility="{Binding HasPriceWarning, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="The selling price is below the purchase cost. You can still save, but this item would be sold at a loss."
+                                       TextWrapping="Wrap"/>
+                        </Border>
+
+                        <StackPanel Style="{StaticResource FieldGroup}"
+                                    Visibility="{Binding ShowReason, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="Reason for price change" Style="{StaticResource Text.FieldLabel}"/>
+                            <TextBox Text="{Binding PriceChangeReason, UpdateSourceTrigger=PropertyChanged}"
+                                     MaxLength="200"
+                                     AutomationProperties.Name="Reason for price change"/>
+                            <TextBlock Text="Optional. Recorded in the price history."
+                                       Style="{StaticResource Text.Caption}"
+                                       Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===== Price history (edit only) ===== -->
+                <Border Style="{StaticResource Card}" Padding="0" Margin="0,16,0,0"
+                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Price history" Style="{StaticResource Text.Subtitle}" Margin="24,22,24,12"/>
+
+                        <TextBlock Text="No price changes recorded yet."
+                                   Margin="24,0,24,22">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Caption}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasPriceHistory}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <DataGrid ItemsSource="{Binding PriceHistory}"
+                                  BorderThickness="0,1,0,0"
+                                  MaxHeight="260"
+                                  Visibility="{Binding HasPriceHistory, Converter={StaticResource BoolToVisibility}}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="WHEN" Binding="{Binding When}" Width="1.3*"/>
+                                <DataGridTextColumn Header="PURCHASE COST" Binding="{Binding Cost}" Width="1.5*"/>
+                                <DataGridTextColumn Header="SELLING PRICE" Binding="{Binding Price}" Width="1.5*"/>
+                                <DataGridTextColumn Header="REASON" Binding="{Binding Reason}" Width="1.5*"/>
+                                <DataGridTextColumn Header="BY" Binding="{Binding ChangedBy}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer actions -->
+        <Border Grid.Row="2"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="32,14">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Cancel"
+                        Style="{StaticResource Button.Secondary}"
+                        Command="{Binding CancelCommand}"
+                        MinWidth="100"/>
+                <Button Content="{Binding SaveText}"
+                        Style="{StaticResource Button.Primary}"
+                        Command="{Binding SaveCommand}"
+                        MinWidth="150"
+                        Margin="10,0,0,0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
